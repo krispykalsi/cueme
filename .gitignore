@@ -1,3 +1,4 @@
 .env.secret
 bin
 vendor
+.github
