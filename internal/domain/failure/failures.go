@@ -1,9 +1,8 @@
 package failure
 
 const (
-	noPhone    = "phone num to dede bro"
-	noEmail    = "yrr email kon dega"
-	badMedium  = "wrong medium. Only choices are sms / phone / whatsapp"
+	noPhone = "phone num to dede bro"
+	noEmail = "yrr email kon dega"
 )
 
 func NoPhone() error {
@@ -12,8 +11,4 @@ func NoPhone() error {
 
 func NoEmail() error {
 	return failure{msg: noEmail}
-}
-
-func BadMedium() error {
-	return failure{msg: badMedium}
 }

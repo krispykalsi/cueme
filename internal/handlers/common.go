@@ -6,42 +6,60 @@ import (
 	"cueme/internal/domain/model"
 	"cueme/pkg/api/twilio"
 	"github.com/gin-gonic/gin"
+	"time"
 )
 
-func handleError(c *gin.Context, err error) {
-	if err != nil {
-		sendBadResponse(c, err.Error())
+func handleEndpoint(c *gin.Context, req *model.MsgRequest, m medium.Medium) {
+	cueTime, parseErr := req.GetCueTime()
+	if parseErr != nil {
+		handleError(c, parseErr)
+		return
+	}
+
+	if ok, dataErr := isAllDataValid(req, m); ok {
+		now := time.Now()
+		if cueTime.After(now) {
+			time.AfterFunc(cueTime.Sub(now), func() {
+				_ = callApi(req, m)
+			})
+		} else {
+			apiErr := callApi(req, m)
+			handleError(c, apiErr)
+		}
 	} else {
-		sendOKResponse(c)
+		handleError(c, dataErr)
 	}
 }
 
-func handleEndpoint(c *gin.Context, req *model.MsgRequest, m medium.Medium) {
+func callApi(req *model.MsgRequest, m medium.Medium) error {
+	var err error
+
+	switch m {
+	case medium.Sms:
+		err = twilio.SendViaSms(req.Phone, req.Message)
+	case medium.Whatsapp:
+		err = twilio.SendViaWhatsapp(req.Phone, req.Message)
+	case medium.Email:
+		err = twilio.SendViaEmail(req.Email, req.Message)
+	}
+
+	return err
+}
+
+func isAllDataValid(req *model.MsgRequest, m medium.Medium) (bool, error) {
 	isPhoneOk := req.HasValidPhone()
 	isEmailOk := req.HasValidEmail()
 	var err error
 
-	if m == medium.Sms {
-		if isPhoneOk {
-			err = twilio.SendViaSms(req.Phone, req.Message)
-		} else {
-			err = failure.NoPhone()
-		}
-	} else if m == medium.Whatsapp {
-		if isPhoneOk {
-			err = twilio.SendViaWhatsapp(req.Phone, req.Message)
-		} else {
-			err = failure.NoPhone()
-		}
-	} else if m == medium.Email {
-		if isEmailOk {
-			err = twilio.SendViaEmail(req.Email, req.Message)
-		} else {
-			err = failure.NoEmail()
-		}
-	} else {
-		err = failure.BadMedium()
+	if m == medium.Sms || m == medium.Whatsapp && !isPhoneOk {
+		err = failure.NoPhone()
+	} else if m == medium.Email && !isEmailOk {
+		err = failure.NoEmail()
 	}
 
-	handleError(c, err)
+	if err == nil {
+		return true, nil
+	} else {
+		return false, err
+	}
 }

@@ -23,3 +23,11 @@ func sendOKResponse(c *gin.Context) {
 		"msg": "ok, got it",
 	})
 }
+
+func handleError(c *gin.Context, err error) {
+	if err != nil {
+		sendBadResponse(c, err.Error())
+	} else {
+		sendOKResponse(c)
+	}
+}
