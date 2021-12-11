@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cueme-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cueme-api
+  template:
+    metadata:
+      labels:
+        app: cueme-api
+    spec:
+      containers:
+        - image: krispykalsi/cueme-api:2.0
+          name: cueme-api
+          volumeMounts:
+            - name: secrets
+              mountPath: "/cueme-secrets"
+              readOnly: true
+      volumes:
+        - name: secrets
+          secret:
+            secretName: keys-9gtt8btfm9

@@ -9,7 +9,7 @@ COPY go.sum /go/src/cueme
 RUN go mod download
 
 COPY . /go/src/cueme
-RUN go build -o bin/server ./cmd/cueme-server
+RUN go build -o bin/server -tags kubernetes ./cmd/cueme-server
 
 CMD ["./bin/server"]
 

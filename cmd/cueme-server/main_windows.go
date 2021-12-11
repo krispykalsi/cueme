@@ -1,5 +1,4 @@
 //go:build windows
-// +build windows
 
 package main
 
@@ -7,7 +6,6 @@ import (
 	"cueme/pkg/platform"
 )
 
-func main() {
+func init() {
 	platform.EnableColorsInShell()
-	runServer()
 }
