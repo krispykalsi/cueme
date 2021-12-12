@@ -13,7 +13,7 @@ spec:
         app: cueme-api
     spec:
       containers:
-        - image: krispykalsi/cueme-api:3.0
+        - image: krispykalsi/cueme-api:3.1
           name: cueme-api
           volumeMounts:
             - name: secrets

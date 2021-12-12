@@ -51,7 +51,7 @@ func isAllDataValid(req *model.MsgRequest, m medium.Medium) (bool, error) {
 	isEmailOk := req.HasValidEmail()
 	var err error
 
-	if m == medium.Sms || m == medium.Whatsapp && !isPhoneOk {
+	if (m == medium.Sms || m == medium.Whatsapp) && !isPhoneOk {
 		err = failure.NoPhone()
 	} else if m == medium.Email && !isEmailOk {
 		err = failure.NoEmail()
