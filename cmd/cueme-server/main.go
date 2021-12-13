@@ -7,6 +7,7 @@ import (
 )
 
 func initialiseRoutes(g *gin.Engine) {
+	g.GET("/api", handlers.Api)
 	g.POST("/api/sms", handlers.Sms)
 	g.POST("/api/wa", handlers.Whatsapp)
 	g.POST("/api/email", handlers.Email)
